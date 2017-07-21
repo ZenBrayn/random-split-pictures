@@ -8,8 +8,11 @@ function setup() {
   img.loadPixels();
   color_rects = [];
 
+  // Splitting params
   split_mode = "largest_area";
+  // split_mode = "random";
   split_dir_mode = "longest_side";
+  // split_dir_mode = "random";
 
   // Add a new single ColorRect covering the entire sketch
   var new_rect = new ColorRect();
@@ -48,6 +51,11 @@ function splitRect(split_mode, split_dir_mode) {
   }
   var rect_sel = color_rects[idx];
 
+  // If there is a 1x1 pixel, just return
+  if (rect_sel.width == 1 && rect_sel.height == 1) {
+    return;
+  }
+
   // Choose a split direction
   // 0 = horizontal
   // 1 = vertical
@@ -63,8 +71,18 @@ function splitRect(split_mode, split_dir_mode) {
   // Choose a random location to split at
   // and create 2 new rects in its place
   var split_loc;
+  var split_ok = false;
   if (split_dir === 0) {
-    split_loc = floor(random(rect_sel.y, (rect_sel.y + rect_sel.height)));
+    if (rect_sel.height <= 2) {
+      return;
+    }
+
+    while (!split_ok) {
+      split_loc = floor(random(rect_sel.y, (rect_sel.y + rect_sel.height)));
+      if (split_loc > rect_sel.y && split_loc < rect_sel.y + rect_sel.height - 1) {
+        split_ok = true;
+      }
+    }
     
     var new_rect_1 = new ColorRect();
     new_rect_1.assignPosition(rect_sel.x, rect_sel.y);
@@ -81,7 +99,16 @@ function splitRect(split_mode, split_dir_mode) {
     color_rects.push(new_rect_2);
 
   } else {
-    split_loc = floor(random(rect_sel.x, (rect_sel.x + rect_sel.width)));
+    if (rect_sel.width <= 2) {
+      return;
+    }
+
+    while (!split_ok) {
+      split_loc = floor(random(rect_sel.x, (rect_sel.x + rect_sel.width)));
+      if (split_loc > rect_sel.x && split_loc < rect_sel.x + rect_sel.width - 1) {
+        split_ok = true;
+      }
+    }
 
     var new_rect_1 = new ColorRect();
     new_rect_1.assignPosition(rect_sel.x, rect_sel.y);
